@@ -28,7 +28,8 @@ _start:
     mov $stack_top, %esp    # Set stack pointer
 
     # Call C++ kernel main
-    call kernel_main
+    .extern kmain
+    call kmain
 
     # Halt forever
     cli
