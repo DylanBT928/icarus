@@ -28,13 +28,13 @@ cd build
 # Assemble boot.s
 i686-elf-as ../kernel/arch/i386/boot.s -o boot.o
 
-# Compile kernel.cpp
-i686-elf-g++ -c ../kernel/src/kernel.cpp -o kernel.o \
-  -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
+# Compile source files
+i686-elf-g++ -c ../kernel/core/kmain.cpp ../kernel/tty/terminal.cpp ../kernel/drivers/video/vga.cpp \
+          -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
 
 # Link the kernel
 i686-elf-g++ -T ../kernel/linker.ld -o icarus.bin \
-  -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
+          -ffreestanding -O2 -nostdlib boot.o kmain.o vga.o terminal.o -lgcc
 ```
 
 ### Creating Bootable ISO
@@ -68,7 +68,7 @@ qemu-system-i386 -cdrom icarus.iso
 When the kernel boots successfully, you should see:
 
 ```
-"Hello world" - Icarus
+Welcome to Icarus
 ```
 
 ## Resources
