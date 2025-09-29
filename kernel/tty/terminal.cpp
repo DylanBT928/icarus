@@ -42,15 +42,23 @@ void terminalPutEntryAt(char c, uint8_t color, size_t x, size_t y)
 
 void terminalPutChar(char c)
 {
-    terminalPutEntryAt(c, terminalColor, terminalColumn, terminalRow);
-
-    if (++terminalColumn == VGA::WIDTH)
+    if (c == '\n')
     {
         terminalColumn = 0;
+        ++terminalRow;
+    }
+    else
+    {
+        terminalPutEntryAt(c, terminalColor, terminalColumn, terminalRow);
 
-        if (++terminalRow == VGA::HEIGHT)
+        if (++terminalColumn == VGA::WIDTH)
         {
-            terminalRow = 0;
+            terminalColumn = 0;
+
+            if (++terminalRow == VGA::HEIGHT)
+            {
+                terminalRow = 0;
+            }
         }
     }
 }

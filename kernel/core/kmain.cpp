@@ -10,4 +10,7 @@ extern "C" void kmain(void)
 
     terminalSetColor(vgaEntryColor(VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK));
     terminalWriteString("Icarus");
+
+    terminalSetColor(vgaEntryColor(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
+    terminalWriteString("\n\nHello World\n");
 }
