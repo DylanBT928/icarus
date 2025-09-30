@@ -45,20 +45,26 @@ void terminalPutChar(char c)
     if (c == '\n')
     {
         terminalColumn = 0;
-        ++terminalRow;
-    }
-    else
-    {
-        terminalPutEntryAt(c, terminalColor, terminalColumn, terminalRow);
 
-        if (++terminalColumn == VGA::WIDTH)
+        if (++terminalRow == VGA::HEIGHT)
         {
-            terminalColumn = 0;
+            terminalScroll();
+            terminalRow = VGA::HEIGHT - 1;
+        }
 
-            if (++terminalRow == VGA::HEIGHT)
-            {
-                terminalRow = 0;
-            }
+        return;
+    }
+
+    terminalPutEntryAt(c, terminalColor, terminalColumn, terminalRow);
+
+    if (++terminalColumn == VGA::WIDTH)
+    {
+        terminalColumn = 0;
+
+        if (++terminalRow == VGA::HEIGHT)
+        {
+            terminalScroll();
+            terminalRow = VGA::HEIGHT - 1;
         }
     }
 }
@@ -74,4 +80,26 @@ void terminalWrite(const char* data, size_t size)
 void terminalWriteString(const char* data)
 {
     terminalWrite(data, strlen(data));
+}
+
+void terminalScroll()
+{
+    const size_t width = VGA::WIDTH;
+    const size_t height = VGA::HEIGHT;
+
+    for (size_t y = 1; y < height; ++y)
+    {
+        size_t dest = (y - 1) * width;
+        size_t src = y * width;
+
+        for (size_t x = 0; x < width; ++x)
+        {
+            terminalBuffer[dest + x] = terminalBuffer[src + x];
+        }
+    }
+
+    for (size_t x = 0; x < width; ++x)
+    {
+        terminalBuffer[(height - 1) * width + x] = vgaEntry(' ', terminalColor);
+    }
 }
