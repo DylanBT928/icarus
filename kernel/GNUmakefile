@@ -132,4 +132,5 @@ $(OBJDIR)/%.asm.o: %.asm GNUmakefile $(LIMINE_HDR)
 
 # Clean
 .PHONY: clean
-clean: rm -rf "$(BINDIR)/$(OUTPUT)" "$(OBJDIR)"
+clean: 
+	rm -rf "$(BINDIR)/$(OUTPUT)" "$(OBJDIR)"
