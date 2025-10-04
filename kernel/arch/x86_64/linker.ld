@@ -1,4 +1,5 @@
 OUTPUT_FORMAT(elf64-x86-64)
+OUTPUT_ARCH(i386:x86-64)
 
 ENTRY(kmain)
 
@@ -42,13 +43,34 @@ SECTIONS
         *(.data .data.*)
     } :data
 
+    .init_array : {
+        PROVIDE_HIDDEN(__init_array_start = .);
+        KEEP(*(.init_array .init_array.*))
+        PROVIDE_HIDDEN(__init_array_end = .);
+    } :data
+
+    .fini_array : {
+        PROVIDE_HIDDEN(__fini_array_start = .);
+        KEEP(*(.fini_array .fini_array.*))
+        PROVIDE_HIDDEN(__fini_array_end = .);
+    } :data
+
+    . = ALIGN(16);
+
     .bss : {
+        PROVIDE(__bss_start = .);
         *(.bss .bss.*)
         *(COMMON)
+        PROVIDE(__bss_end = .);
     } :data
+
+    PROVIDE(__kernel_end = .);
 
     /DISCARD/ : {
         *(.eh_frame*)
+        *(.eh_frame_hdr*)
+        *(.gcc_except_table*)
         *(.note .note.*)
+        *(.comment)
     }
 }

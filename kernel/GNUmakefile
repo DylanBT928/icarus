@@ -20,84 +20,102 @@ endif
 
 # Compiler
 ifneq ($(TOOLCHAIN_PREFIX),)
-	CC := $(TOOLCHAIN_PREFIX)gcc
+	CXX := $(TOOLCHAIN_PREFIX)g++
 else
-	CC := cc
+	CXX := c++
 endif
 
 # Linker
-LD := $(TOOLCHAIN_PREFIX)ld
+LDXX := $(CXX)
 
 ifeq ($(TOOLCHAIN),llvm)
-	CC := clang
-	LD := ld.lld
+	LDXX := ld.lld
 endif
-
-# Flags
-CFLAGS := -g -O2 -pipe
-CPPFLAGS :=
-NASMFLAGS := -g
-LDFLAGS :=
 
 # Detect clang
-override CC_IS_CLANG := $(sheel ! $(CC) --version 2>/dev/null | grep -q '^Target: '; echo $$?)
-ifeq ($(CC_IS_CLANG),1)
-	override CC += -target x86_64-unknown-none-elf
+CXX_IS_CLANG := $(shell $(CXX) --version 2>/dev/null | head -n1 | grep -qi clang && echo 1 || echo 0)
+ifeq ($(CXX_IS_CLANG),1)
+	override CXX += -target x86_64-unknown-none-elf
 endif
 
-# Internal compile/link flags
-override CFLAGS += \
-	-Wall -Wextra \
-	-std=gnu11 \
+# Limine header
+LIMINE_DIR := $(ROOT)/bin/limine
+LIMINE_HDR := $(LIMINE_DIR)/limine.h
+
+# Flags
+CXXFLAGS := -g -O2 -pipe
+
+# Common kernel flags
+COMMON_FLAGS := \
 	-ffreestanding \
+	-fno-exceptions \
+	-fno-rtti \
+	-fno-unwind-tables \
+	-fno-asynchronous-unwind-tables \
 	-fno-stack-protector \
 	-fno-stack-check \
 	-fno-lto \
 	-fno-PIC \
-	-ffunction-sections -fdata-sections \
-	-m64 -march=x86-64 -mabi=sysv \
-	-mno-80387 -mno-mmx -mno-sse -mno-sse2 \
+	-ffunction-sections \
+	-fdata-sections \
+	-nostdinc++ \
+	-m64 \
+	-march=x86-64 \
+	-mabi=sysv \
+	-mno-80387 \
+	-mno-mmx \
+	-mno-sse \
+	-mno-sse2 \
 	-mno-red-zone \
 	-mcmodel=kernel
 
-LIMINE_DIR := $(ROOT)/bin/limine
-LIMINE_HDR := $(LIMINE_DIR)/limine.h
+override CXXFLAGS += \
+	-Wall \
+	-Wextra \
+	-std=gnu++20 \
+	$(COMMON_FLAGS)
 
-override CPPFLAGS := \
-	-I src \
+# Preprocessor
+CPPFLAGS := \
 	-I core \
 	-I $(LIMINE_DIR) \
-	$(CPPFLAGS) \
 	-DLIMINE_API_REVISION=3 \
-	-MMD -MP
+	-MMD \
+	-MP
 
-override NASMFLAGS := \
-	-f elf64 \
-	$(patsubst -g,-g -F dwarf,$(NASMFLAGS)) \
+# NASM
+NASMFLAGS := \
+	-g \
+	-F \
+	dwarf \
+	-f \
+	elf64 \
 	-Wall
 
-override LDFLAGS += \
-	-m elf_x86_64 \
+# Linker flags
+LDFLAGS := \
 	-nostdlib \
 	-static \
-	-z max-page-size=0x1000 \
-	--gc-sections \
-	-T arch/x86_64/linker.ld
+	-Wl,-z,max-page-size=0x1000 \
+	-Wl,--gc-sections \
+	-Wl,-T,arch/x86_64/linker.ld
 
-# Sources / objects
+# Sources
 SRC_DIRS := core
 
-override SRCFILES := $(shell find -L $(SRC_DIRS) -type f \( -name '*.c' -o -name '*.S' -o -name '*.asm' \) 2>/dev/null | LC_ALL=C sort)
-override CFILES := $(filter %.c,$(SRCFILES))
-override ASFILES := $(filter %.S,$(SRCFILES))
-override NASMFILES := $(filter %.asm,$(SRCFILES))
+SRCFILES := $(shell find -L $(SRC_DIRS) -type f \( -name '*.cpp' -o -name '*.S' -o -name '*.asm' \) 2>/dev/null | LC_ALL=C sort)
+CPPFILES := $(filter %.cpp,$(SRCFILES))
+ASFILES := $(filter %.S,$(SRCFILES))
+NASMFILES := $(filter %.asm,$(SRCFILES))
 
-override OBJ := $(addprefix $(OBJDIR)/,$(CFILES:.c=.c.o) \
-	$(ASFILES:.S=.S.o) \
-	$(NASMFILES:.asm=.asm.o))
+OBJ := \
+	$(addprefix $(OBJDIR)/,$(CPPFILES:.cpp=.cpp.o)) \
+	$(addprefix $(OBJDIR)/,$(ASFILES:.S=.S.o)) \
+	$(addprefix $(OBJDIR)/,$(NASMFILES:.asm=.asm.o))
 
-override HEADER_DEPS := $(addprefix $(OBJDIR)/,$(CFILES:.c=.c.d) \
-	$(ASFILES:.S=.S.d))
+HEADER_DEPS := \
+	$(addprefix $(OBJDIR)/,$(CPPFILES:.cpp=.cpp.d)) \
+	$(addprefix $(OBJDIR)/,$(ASFILES:.S=.S.d))
 
 # Default target
 .PHONY: all
@@ -112,20 +130,20 @@ $(LIMINE_HDR):
 # Link final kernel
 $(BINDIR)/$(OUTPUT): GNUmakefile arch/x86_64/linker.ld $(OBJ)
 	@mkdir -p "$(dir $@)"
-	$(LD) $(LDFLAGS) $(OBJ) -o $@
+	$(LDXX) $(LDFLAGS) $(OBJ) -o $@
 
-# Compiler rules
-# C
-$(OBJDIR)/%.c.o: %.c GNUmakefile $(LIMINE_HDR)
+# Compile rules
+# C++ sources
+$(OBJDIR)/%.cpp.o: %.cpp GNUmakefile $(LIMINE_HDR)
 	@mkdir -p "$(dir $@)"
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-# GAS
+# GAS assembly with preprocessor
 $(OBJDIR)/%.S.o: %.S GNUmakefile $(LIMINE_HDR)
 	@mkdir -p "$(dir $@)"
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-# NASM
+# NASM assembly
 $(OBJDIR)/%.asm.o: %.asm GNUmakefile $(LIMINE_HDR)
 	@mkdir -p "$(dir $@)"
 	nasm $(NASMFLAGS) $< -o $@
