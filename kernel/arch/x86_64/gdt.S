@@ -27,7 +27,7 @@ reload_segments:
     push    rdi
     lea     rax, [rip + .after_cs]
     push    rax
-    lretq
+    retfq
 
 .after_cs:
     mov     ax, si

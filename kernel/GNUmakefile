@@ -101,7 +101,7 @@ LDFLAGS := \
 	-Wl,-T,arch/x86_64/linker.ld
 
 # Sources
-SRC_DIRS := core arch/x86_64
+SRC_DIRS := core arch
 
 SRCFILES := $(shell find -L $(SRC_DIRS) -type f \( -name '*.cpp' -o -name '*.S' -o -name '*.asm' \) 2>/dev/null | LC_ALL=C sort)
 CPPFILES := $(filter %.cpp,$(SRCFILES))
