@@ -13,7 +13,7 @@ PHDRS
 
 SECTIONS
 {
-    . = 0xffffffff80000000;
+    . = 0xFFFFFFFF80000000;
 
     .limine_requests : {
         KEEP(*(.limine_requests_start))

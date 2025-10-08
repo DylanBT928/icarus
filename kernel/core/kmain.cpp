@@ -1,3 +1,5 @@
+#include "../arch/x86_64/gdt.hpp"
+
 #include <stddef.h>
 #include <stdint.h>
 #include <limine.h>
@@ -112,7 +114,7 @@ static inline void hcf()
 {
     for (;;)
     {
-        __asm__ __volatile__("hlt");
+        asm volatile("hlt");
     }
 }
 
@@ -136,8 +138,11 @@ extern "C" void kmain()
     for (size_t i = 0; i < 100; ++i)
     {
         volatile uint32_t* fb_ptr = static_cast<volatile uint32_t*>(fb->address);
-        fb_ptr[i * (fb->pitch / 4) + i] = 0xffffffu;
+        fb_ptr[i * (fb->pitch / 4) + i] = 0xFFFFFFu;
     }
+
+    asm volatile("cli");
+    GDT::init();
 
     hcf();
 }

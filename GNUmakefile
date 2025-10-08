@@ -13,4 +13,4 @@ run: iso
 
 clean:
 	rm -rf bin/iso_root bin/icarus.iso
-	-$(MAKE) -C kernel clean
+	make -C kernel clean
