@@ -2,73 +2,55 @@
 
 # icarus ☀️
 
+**Experimental 64-bit operating system built with C++ and Limine**
+
+![GitHub Release](https://img.shields.io/github/v/release/DylanBT928/icarus)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/DylanBT928/icarus)
+![GitHub License](https://img.shields.io/github/license/DylanBT928/icarus)
+
 </div>
 
-Icarus is a minimal 32-bit x86 (i386) kernel implemented in C++ with a GAS boot stub, built with an i686-elf cross-compiler. It is loaded by GRUB via Multiboot v1 and run in QEMU. I built this as a hobby project to learn more about operating systems and kernel development.
+Icarus is an experimental x86-64 kernel implemented in C++, booted via the Limine bootloader. It runs in long mode on QEMU and serves as a hobby project to learn more about operating systems and kernel development.
 
 ## Prerequisites
 
-### Required Tools
-
-- **i686-elf cross-compiler** (GCC/G++/AS) with libgcc
-- **GRUB tools** (for ISO creation): `grub-file`, `grub-mkrescue`
-- **QEMU** (for testing the kernel)
+- **x86_64-elf cross-compiler**
+- **QEMU** (testing the kernel)
+- **GNU Make** (build automation)
 
 > Note: You can build the cross-compiler by following the [OSDev Cross-Compiler Guide](https://wiki.osdev.org/GCC_Cross-Compiler).
 
 ## Building
 
-### Build the Kernel
+Everything is automated through the GNUmakefile.
+To build and run Icarus, simply execute:
 
 ```bash
-# Create build directory
-mkdir -p build
-cd build
-
-# Assemble boot.s
-i686-elf-as ../kernel/arch/i386/boot.s -o boot.o
-
-# Compile source files
-i686-elf-g++ -c ../kernel/core/kmain.cpp ../kernel/tty/terminal.cpp ../kernel/drivers/video/vga.cpp \
-          -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti
-
-# Link the kernel
-i686-elf-g++ -T ../kernel/linker.ld -o icarus.bin \
-          -ffreestanding -O2 -nostdlib boot.o kmain.o vga.o terminal.o -lgcc
+make run
 ```
 
-### Creating Bootable ISO
+This will:
+
+1. Build the kernel (`kernel/`)
+2. Package it into a Limine-bootable ISO (`bin/icarus.iso`)
+3. Launch it automatically in QEMU
+
+### Available Make Targets
 
 ```bash
-# Create ISO directory structure
-mkdir -p isodir/boot/grub
-
-# Copy kernel and GRUB config
-cp icarus.bin isodir/boot/
-cp ../grub/grub.cfg isodir/boot/grub/
-
-# Create bootable ISO
-i686-elf-grub-mkrescue -o icarus.iso isodir
+make all     # Default target (build ISO)
+make kernel  # Build only the kernel
+make iso     # Package ISO with Limine
+make run     # Build and run the kernel in QEMU
+make clean   # Remove build artifacts
 ```
 
-## Running
+### Running Manually
 
-### Using QEMU
+If you prefer to run QEMU manually:
 
 ```bash
-# Run the kernel directly
-qemu-system-i386 -kernel icarus.bin
-
-# Run from ISO
-qemu-system-i386 -cdrom icarus.iso
-```
-
-### Expected Output
-
-When the kernel boots successfully, you should see:
-
-```
-Welcome to Icarus
+qemu-system-x86_64 -cdrom bin/icarus.iso
 ```
 
 ## Resources
