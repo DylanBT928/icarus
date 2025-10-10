@@ -1,4 +1,5 @@
 #include "../arch/x86_64/gdt.hpp"
+#include "serial.hpp"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -132,6 +133,9 @@ extern "C" void kmain()
     {
         hcf();
     }
+
+    serial_init();
+    serial_print("\"Hello world\" - Icarus\n");
 
     struct limine_framebuffer* fb = framebuffer_request.response->framebuffers[0];
 
