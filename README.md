@@ -50,7 +50,7 @@ make clean   # Remove build artifacts
 If you prefer to run QEMU manually:
 
 ```bash
-qemu-system-x86_64 -cdrom bin/icarus.iso
+qemu-system-x86_64 -serial stdio -cdrom bin/icarus.iso
 ```
 
 ## Resources
