@@ -1,4 +1,5 @@
 #include "../arch/x86_64/gdt.hpp"
+#include "../arch/x86_64/idt.hpp"
 #include "serial.hpp"
 
 #include <stddef.h>
@@ -134,6 +135,7 @@ extern "C" void kmain()
         hcf();
     }
 
+    // Test "Hello World"
     serial_init();
     serial_print("\"Hello world\" - Icarus\n");
 
@@ -147,6 +149,13 @@ extern "C" void kmain()
 
     asm volatile("cli");
     GDT::init();
+    IDT::init();
+
+    // Test trap (prints once)
+    asm volatile("int3");
+
+    // Test fault (prints infinitely)
+    asm volatile("ud2");
 
     hcf();
 }
