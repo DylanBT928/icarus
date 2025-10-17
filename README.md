@@ -12,6 +12,23 @@
 
 Icarus is an experimental x86-64 kernel implemented in C++, booted via the Limine bootloader. It runs in long mode on QEMU and serves as a hobby project to learn more about operating systems and kernel development.
 
+## Roadmap
+
+- [x] Limine barebones (bootloader → kernel entry)
+- [x] GDT / IDT / ISRs / IRQs (basic exception + interrupt handling)
+- [ ] PMM (physical memory manager)
+- [ ] Paging (basic page tables)
+- [ ] VMM (virtual memory manager + allocators)
+- [ ] Basic drivers (keyboard, framebuffer/terminal output)
+- [ ] ACPI tables (parse for multiprocessor + timers)
+- [ ] APIC → IOAPIC → LAPIC → HPET → APIC timer
+- [ ] SMP bring-up (secondary cores online)
+- [ ] Multitasking / scheduling
+- [ ] Syscalls (define ABI)
+- [ ] ELF loader (for user programs)
+- [ ] Userspace (init process, libc stubs, etc.)
+- [ ] SIMD / advanced CPU features (SSE, AVX, FPU context switching)
+
 ## Prerequisites
 
 - **x86_64-elf cross-compiler**
