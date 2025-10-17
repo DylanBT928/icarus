@@ -1,9 +1,42 @@
 #include "isr_common.hpp"
+#include "pic.hpp"
+#include "../../core/io.hpp"
+
+static volatile uint64_t g_ticks = 0;
 
 extern "C"
 {
     void isr_common(uint16_t vec, uint64_t err)
     {
+        if (vec == 0x20)
+        {
+            *(volatile uint64_t*)&g_ticks = g_ticks + 1;
+
+            if ((g_ticks % 100) == 0)
+            {
+                serial_print("tick\n");
+            }
+
+            pic_eoi(0);
+            return;
+        }
+
+        if (vec == 0x21)
+        {
+            uint8_t scancode = inb(0x60);
+            serial_print("keyboard scancode ");
+
+            char buf[6] = "0x00\n";
+            const char* hex = "0123456789abcdef";
+
+            buf[2] = hex[(scancode >> 4) & 0xF];
+            buf[3] = hex[scancode & 0xF];
+
+            serial_print(buf);
+            pic_eoi(1);
+            return;
+        }
+
         auto phex = [](uint64_t x)
         {
             char buf[19];

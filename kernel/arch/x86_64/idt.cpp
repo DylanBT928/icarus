@@ -23,6 +23,8 @@ extern "C"
     void isr_stub_0x13();
     void isr_stub_0x14();
     void isr_stub_0x15();
+    void isr_stub_0x20();
+    void isr_stub_0x21();
 }
 
 void IDT::encode(uint8_t* t, IDTGateSrc s)
@@ -103,6 +105,9 @@ void IDT::init()
     set(0x13, isr_stub_0x13, s_table, KCODE, INTG);  // #XM
     set(0x14, isr_stub_0x14, s_table, KCODE, INTG);  // #VE
     set(0x15, isr_stub_0x15, s_table, KCODE, INTG);  // #CP (err)
+
+    set(0x20, isr_stub_0x20, s_table, KCODE, INTG);  // PIT timer
+    set(0x21, isr_stub_0x21, s_table, KCODE, INTG);  // keyboard
 
     const uint16_t limit = sizeof(s_table) - 1;
     set_idt(limit, &s_table[0]);

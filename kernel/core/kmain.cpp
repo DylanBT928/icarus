@@ -1,5 +1,7 @@
 #include "../arch/x86_64/gdt.hpp"
 #include "../arch/x86_64/idt.hpp"
+#include "../arch/x86_64/pic.hpp"
+#include "../arch/x86_64/pit.hpp"
 #include "serial.hpp"
 
 #include <stddef.h>
@@ -155,7 +157,15 @@ extern "C" void kmain()
     asm volatile("int3");
 
     // Test fault (prints infinitely)
-    asm volatile("ud2");
+    // asm volatile("ud2");
+
+    pic_remap();
+    pit_init(100);
+    pic_set_masks(0b1111'1110, 0xFF);
+
+    asm volatile("sti");
+
+    pic_set_masks(0b1111'1100, 0xFF);
 
     hcf();
 }
