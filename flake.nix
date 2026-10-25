@@ -26,10 +26,13 @@
         {
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
+              cmake
               gdb
               gnumake
-              mtools
               grub2
+              mtools
+              nasm
+              ninja
               pkgsCross.i686-embedded.buildPackages.binutils
               pkgsCross.i686-embedded.buildPackages.gcc
               qemu
