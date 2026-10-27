@@ -99,7 +99,7 @@ class Terminal
     std::uint16_t* buffer;
 };
 
-void kernel_main()
+extern "C" void kernel_main()
 {
     Terminal terminal;
     terminal.writeString("for he knew to fall means to once have soared");
