@@ -102,5 +102,7 @@ class Terminal
 extern "C" void kernel_main()
 {
     Terminal terminal;
-    terminal.writeString("for he knew to fall means to once have soared");
+    terminal.writeString("for he knew to fall means to once have ");
+    terminal.setColor(VGA::Color::Green);
+    terminal.writeString("soared");
 }
