@@ -47,7 +47,7 @@ class Terminal
     {
         for (std::size_t y{}; y < VGA::height; ++y)
         {
-            for (std::size_t x{}; x < VGA::height; ++x)
+            for (std::size_t x{}; x < VGA::width; ++x)
             {
                 buffer[y * VGA::width + x] = VGA::entry(' ', color);
             }
