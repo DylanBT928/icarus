@@ -23,6 +23,18 @@ struct VGA
         Black = 0,
         Blue = 1,
         Green = 2,
+        Cyan = 3,
+        Red = 4,
+        Magenta = 5,
+        Brown = 6,
+        LightGray = 7,
+        DarkGray = 8,
+        LightBlue = 9,
+        LightGreen = 10,
+        LightCyan = 11,
+        LightRed = 12,
+        LightMagenta = 13,
+        LightBrown = 14,
         White = 15
     };
 
@@ -102,7 +114,11 @@ class Terminal
 extern "C" void kernel_main()
 {
     Terminal terminal;
-    terminal.writeString("for he knew to fall means to once have ");
-    terminal.setColor(VGA::Color::Green);
+    terminal.writeString("for he knew to");
+    terminal.setColor(VGA::Color::LightGreen);
+    terminal.writeString(" fall ");
+    terminal.setColor(VGA::Color::White);
+    terminal.writeString("means to once have ");
+    terminal.setColor(VGA::Color::LightRed);
     terminal.writeString("soared");
 }
