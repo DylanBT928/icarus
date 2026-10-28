@@ -1,2 +1,2 @@
-# !usr/bin/bash
+#!/usr/bin/bash
 cmake --build build

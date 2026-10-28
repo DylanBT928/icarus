@@ -1,2 +1,2 @@
-# !usr/bin/bash
-grub-mkrescue -o build/icarus.iso build/isodir
+#!/usr/bin/bash
+grub-mkrescue -o build/icarus.iso build/src/kernel
