@@ -2,3 +2,5 @@
 .envrc
 
 bin/
+build/
+build-i686/

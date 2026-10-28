@@ -31,7 +31,6 @@
               gnumake
               grub2
               mtools
-              nasm
               ninja
               pkgsCross.i686-embedded.buildPackages.binutils
               pkgsCross.i686-embedded.buildPackages.gcc
