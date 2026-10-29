@@ -19,3 +19,30 @@ add_subdirectory(src/kernel)
 # add_subdirectory(src/libc)
 
 install(FILES bootloader/grub.cfg DESTINATION boot/grub)
+
+find_program(GRUB_MKRESCUE_EXECUTABLE grub-mkrescue REQUIRED)
+
+set(ISO_ROOT "${CMAKE_CURRENT_BINARY_DIR}/isodir")
+set(ISO_IMAGE "${CMAKE_CURRENT_BINARY_DIR}/icarus.iso")
+
+add_custom_command(
+    OUTPUT "${ISO_IMAGE}"
+
+    COMMAND "${CMAKE_COMMAND}" --install "${CMAKE_CURRENT_BINARY_DIR}"
+             --prefix "${ISO_ROOT}"
+             --config "$<CONFIG>"
+
+    COMMAND "${GRUB_MKRESCUE_EXECUTABLE}"
+             -o "${ISO_IMAGE}" "${ISO_ROOT}"
+
+    DEPENDS
+         kernel
+         "${CMAKE_CURRENT_SOURCE_DIR}/bootloader/grub.cfg"
+         "${CMAKE_CURRENT_BINARY_DIR}/cmake_install.cmake"
+         "${CMAKE_CURRENT_BINARY_DIR}/src/kernel/cmake_install.cmake"
+
+    COMMENT "Staging boot files and generating Icarus ISO"
+    VERBATIM
+)
+
+add_custom_target(iso DEPENDS "${ISO_IMAGE}")
