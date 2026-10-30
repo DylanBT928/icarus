@@ -2,42 +2,49 @@
 
 # icarus ☀️
 
-### custom 32-bit x86 kernel
+### Custom 32-bit x86 Kernel
 
 </div>
 
-_for he knew to fall means to once have soared_
+Icarus is a hobby kernel developed from scratch. We started this project for fun and curiosity to learn more about what happens under the hood.
 
-## build and run
+## Prerequisites
 
-you will need `cmake` and a cross-compiler for `i686-elf` ([more info](https://wiki.osdev.org/Bare_Bones#Building_a_Cross-Compiler)).
+- [i686-elf cross-compiler](https://wiki.osdev.org/GCC_Cross-Compiler)
+- CMake
+- Ninja
+- xorriso
+- GRUB
+- QEMU
+
+## Build and Run
+
+### Non-Nix Users
 
 ```sh
 cmake -B build
 ./scripts/build.sh
-```
-
-run using qemu
-```sh
 ./scripts/run.sh
 ```
 
-### nix users
+### Nix Users
 
 ```sh
 nix build
 nix run
 ```
 
-## development
+#### Develop on Nix
 
-### nix users
+Enter the Nix shell with all toolchains and dependencies:
 
 ```sh
 nix develop
 ```
 
-optionally, with `direnv` and `nix-direnv` installed:
+Optionally, automate loading the environment with `direnv` and `nix-direnv`:
+
 ```sh
-echo "use flake" > .envrc && direnv allow
+echo "use flake" > .envrc
+direnv allow
 ```
