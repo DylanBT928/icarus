@@ -1,0 +1,6 @@
+-ffreestanding
+-Wall
+-Wextra
+-Wpedantic
+-fno-exceptions
+-fno-rtti
