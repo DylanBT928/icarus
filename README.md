@@ -48,3 +48,8 @@ Optionally, automate loading the environment with `direnv` and `nix-direnv`:
 echo "use flake" > .envrc
 direnv allow
 ```
+
+## References
+
+- [OSDev Wiki](https://wiki.osdev.org/Expanded_Main_Page)
+- [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/)
