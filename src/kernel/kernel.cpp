@@ -78,6 +78,13 @@ class Terminal
 
     void putChar(char c)
     {
+        if (c == '\n')
+        {
+            ++row;
+            col = 0;
+            return;
+        }
+
         putEntryAt(c, color, col, row);
 
         if (++col == VGA::width)
@@ -114,11 +121,15 @@ class Terminal
 extern "C" void kernel_main()
 {
     Terminal terminal;
+
     terminal.writeString("for he knew to");
     terminal.setColor(VGA::Color::LightGreen);
     terminal.writeString(" fall ");
     terminal.setColor(VGA::Color::White);
     terminal.writeString("means to once have ");
     terminal.setColor(VGA::Color::LightRed);
-    terminal.writeString("soared");
+    terminal.writeString("soared\n");
+    terminal.setColor(VGA::Color::White);
+
+    terminal.writeString("welcome to icarus\n");
 }
