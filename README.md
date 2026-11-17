@@ -23,8 +23,8 @@ Icarus is a hobby kernel developed from scratch. We started this project for fun
 
 ```sh
 cmake -B build
-./scripts/build.sh
-./scripts/run.sh
+cmake --build build --target iso
+qemu-system-i386 -cdrom build/icarus.iso
 ```
 
 ### Nix Users
