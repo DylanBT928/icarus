@@ -131,7 +131,7 @@
             exec ${pkgs.qemu}/bin/qemu-system-x86_64 \
               -drive if=pflash,format=raw,unit=0,readonly=on,file="${pkgs.OVMF.fd}/FV/OVMF_CODE.fd" \
               -drive if=pflash,format=raw,unit=1,file="$state/OVMF_VARS.fd" \
-              -cdrom "${self'.packages.default}/share/icarus/icarus.iso" \
+              -cdrom "${self'.packages.debug}/share/icarus/icarus.iso" \
               -boot order=d,menu=on \
               -no-reboot \
               -no-shutdown \
