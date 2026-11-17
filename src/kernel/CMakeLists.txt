@@ -4,7 +4,7 @@ add_executable(kernel
 )
 
 target_compile_options(kernel PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-fno-exceptions;-ffreestanding;-fno-rtti>"
+    "$<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-fno-exceptions;-ffreestanding;-fno-rtti;-mno-red-zone;-mno-mmx;-mcmodel=large;-mno-sse;-mno-sse2>"
    "$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Debug>>:-O0;-g>"
    "$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<CONFIG:Debug>>>:-O2>"
 )

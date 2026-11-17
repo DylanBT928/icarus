@@ -28,11 +28,11 @@
               cmake
               gdb
               gnumake
-              grub2
+              grub2_efi
               mtools
               ninja
-              pkgsCross.i686-embedded.buildPackages.binutils
-              pkgsCross.i686-embedded.buildPackages.gcc
+              pkgsCross.x86_64-embedded.buildPackages.binutils
+              pkgsCross.x86_64-embedded.buildPackages.gcc
               qemu
               xorriso
             ];
@@ -46,11 +46,11 @@
 
             nativeBuildInputs = with pkgs; [
               cmake
-              grub2
+              grub2_efi
               mtools
               ninja
-              pkgsCross.i686-embedded.buildPackages.binutils
-              pkgsCross.i686-embedded.buildPackages.gcc
+              pkgsCross.x86_64-embedded.buildPackages.binutils
+              pkgsCross.x86_64-embedded.buildPackages.gcc
               xorriso
             ];
 
@@ -77,9 +77,25 @@
           # creates a shell script as a binary in the nix store
           # that runs qemu on the built iso in the nix store
           packages.runner = pkgs.writeShellScriptBin "icarus-runner" ''
-            exec ${pkgs.qemu}/bin/qemu-system-i386 \
-            -cdrom "${self'.packages.default}/share/icarus/icarus.iso" \
-            "$@"
+            set -eu
+
+            state="$HOME/.local/state/icarus"
+            mkdir -p "$state"
+
+            if [ ! -e "$state/OVMF_VARS.fd" ]; then
+              cp "${pkgs.OVMF.fd}/FV/OVMF_VARS.fd" "$state/OVMF_VARS.fd"
+              chmod u+w "$state/OVMF_VARS.fd"
+            fi
+
+            exec ${pkgs.qemu}/bin/qemu-system-x86_64 \
+              -drive if=pflash,format=raw,unit=0,readonly=on,file="${pkgs.OVMF.fd}/FV/OVMF_CODE.fd" \
+              -drive if=pflash,format=raw,unit=1,file="$state/OVMF_VARS.fd" \
+              -cdrom "${self'.packages.default}/share/icarus/icarus.iso" \
+              -boot order=d,menu=on \
+              -no-reboot \
+              -no-shutdown \
+              -serial stdio \
+              "$@"
           '';
 
           apps.default = {
@@ -102,11 +118,26 @@
           # and then
           # `(gdb) remote target 127.0.0.1:1234`
           packages.debug-runner = pkgs.writeShellScriptBin "icarus-debug" ''
-            exec ${pkgs.qemu}/bin/qemu-system-i386 \
-            -cdrom "${self'.packages.debug}/share/icarus/icarus.iso" \
-            -gdb tcp:127.0.0.1:1234 \
-            -S \
-            "$@"
+            set -eu
+
+            state="$HOME/.local/state/icarus"
+            mkdir -p "$state"
+
+            if [ ! -e "$state/OVMF_VARS.fd" ]; then
+              cp "${pkgs.OVMF.fd}/FV/OVMF_VARS.fd" "$state/OVMF_VARS.fd"
+              chmod u+w "$state/OVMF_VARS.fd"
+            fi
+
+            exec ${pkgs.qemu}/bin/qemu-system-x86_64 \
+              -drive if=pflash,format=raw,unit=0,readonly=on,file="${pkgs.OVMF.fd}/FV/OVMF_CODE.fd" \
+              -drive if=pflash,format=raw,unit=1,file="$state/OVMF_VARS.fd" \
+              -cdrom "${self'.packages.default}/share/icarus/icarus.iso" \
+              -boot order=d,menu=on \
+              -no-reboot \
+              -no-shutdown \
+              -gdb tcp:127.0.0.1:1234 \
+              -serial stdio \
+              "$@"
           '';
 
           apps.debug = {

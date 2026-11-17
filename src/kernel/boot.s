@@ -1,36 +1,74 @@
 // constants
-.set ALIGN,    1<<0
-.set MEMINFO,  1<<1
-.set FLAGS,    ALIGN | MEMINFO
-.set MAGIC,    0x1BADB002
-.set CHECKSUM, -(MAGIC + FLAGS)
+.set MAGIC, 0xE85250D6 // Multiboot2
+.set ARCHITECTURE, 0 // x86
+.set HEADER_LENGTH, multiboot_header_end - multiboot_header
+.set CHECKSUM, -(MAGIC + ARCHITECTURE + HEADER_LENGTH)
 
-// declare a multiboot header and mark the program as a kernel
-.section .multiboot
-.align   4
-.long    MAGIC
-.long    FLAGS
-.long    CHECKSUM
+// declare a Multiboot2 header and mark the program as a kernel
+.section .multiboot, "a"
+.balign 8
 
-// explicitly allocates stack because multiboot does not provide one
+// See: www.gnu.org/software/grub/manual/multiboot2/multiboot.html#Header-layout
+multiboot_header:
+
+    // Multiboot2 header tag
+    .long MAGIC
+    .long ARCHITECTURE
+    .long HEADER_LENGTH
+    .long CHECKSUM
+
+    // EFI boot services tag
+    .balign 8
+    .short 7 // type
+    .short 0 // flags
+    .long 8  // size
+
+    // EFI amd64 entry address tag of Multiboot2 header
+    .balign 8
+    .short 9     // type
+    .short 0     // flags
+    .long 12     // size
+    .long _start // entry addr
+
+    // Multiboot2 end tag
+    .balign 8
+    .short 0
+    .short 0
+    .long 8
+
+multiboot_header_end:
+
+// explicitly allocates stack because multiboot2 does not provide one
 .section .bss
-.align   16
+.balign   16
 
 stack_bottom:
     .skip 16384 # 16 KiB
 
 stack_top:
-    .section .text
-    .global  _start
-    .type    _start, @function
+
+.section .text
+.code64
+.global  _start
+.type    _start, @function
 
 _start:
-    mov $stack_top, %esp
+    // load effective address of stack_top relative to instruction pointer 
+    // and store it in stack pointer
+    leaq stack_top(%rip), %rsp
+
+    // clear direction flag so that to advance toward higher addresses of 
+    // a register (System V ABI expects this to be clear)
+    cld
+
     call kernel_main
+
+    // if kernel_main returns (bad), fall back to hlt loop
     cli
 
 1:
     hlt
     jmp 1b
+
 
 .size _start, . - _start
