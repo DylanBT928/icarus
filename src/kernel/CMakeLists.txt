@@ -4,16 +4,31 @@ add_executable(kernel
 )
 
 target_compile_options(kernel PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-fno-exceptions;-ffreestanding;-fno-rtti;-mno-red-zone;-mno-mmx;-mcmodel=large;-mno-sse;-mno-sse2>"
-   "$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Debug>>:-O0;-g>"
-   "$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<CONFIG:Debug>>>:-O2>"
+    "$<$<COMPILE_LANGUAGE:CXX>:
+        -Wall;
+        -Wextra;
+        -ffreestanding;
+        -fno-exceptions;
+        -fno-rtti;
+        -fno-stack-protector;
+        -fno-pie;
+        -mno-red-zone;
+        -mno-mmx;
+        -mno-sse;
+        -mno-sse2;
+        -mcmodel=small
+    >"
+    "$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Debug>>:-O0;-g>"
+    "$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<NOT:$<CONFIG:Debug>>>:-O2>"
 )
 
 set(linker_script "${CMAKE_CURRENT_SOURCE_DIR}/linker.ld")
 
 target_link_options(kernel PRIVATE
    -nostdlib
+   -no-pie
    "LINKER:-T,${linker_script}"
+   "LINKER:-z,max-page-size=0x1000"
 )
 
 target_link_libraries(kernel PRIVATE gcc)
