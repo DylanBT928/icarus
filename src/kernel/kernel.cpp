@@ -115,7 +115,7 @@ class Terminal
     std::size_t row;
     std::size_t col;
     VGA::Color color;
-    std::uint16_t* buffer;
+    volatile std::uint16_t* buffer;
 };
 
 extern "C" void kernel_main()
