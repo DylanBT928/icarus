@@ -4,6 +4,7 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
 
   outputs =
@@ -22,13 +23,16 @@
           system,
           ...
         }:
+        let
+          stable = inputs'.nixpkgs-stable.legacyPackages;
+        in
         {
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               cmake
               gdb
               gnumake
-              grub2_efi
+              stable.grub2_efi
               mtools
               ninja
               pkgsCross.x86_64-embedded.buildPackages.binutils
@@ -46,7 +50,7 @@
 
             nativeBuildInputs = with pkgs; [
               cmake
-              grub2_efi
+              stable.grub2_efi
               mtools
               ninja
               pkgsCross.x86_64-embedded.buildPackages.binutils
