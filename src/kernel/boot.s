@@ -17,6 +17,15 @@ multiboot_header:
     .long HEADER_LENGTH
     .long CHECKSUM
 
+    # framebuffer tag of Multiboot2 header
+    .balign 8
+    .short 5  # type
+    .short 0  # flags
+    .long 20  # size
+    .long 800 # width
+    .long 600 # height
+    .long 32  # depth
+
     # EFI boot services tag
     .balign 8
     .short 7 # type
