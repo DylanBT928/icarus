@@ -120,6 +120,12 @@ class Terminal
 
 extern "C" void kernel_main(std::uint32_t magic, std::uintptr_t multibootInfo)
 {
+    if (magic != 0xE85250D6)
+    {
+        // invalid Multiboot2 handoff
+        return;
+    }
+
     Terminal terminal;
 
     terminal.writeString("for he knew to");
