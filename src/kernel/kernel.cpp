@@ -80,8 +80,13 @@ class Terminal
     {
         if (c == '\n')
         {
-            ++row;
             col = 0;
+
+            if (++row == VGA::height)
+            {
+                row = 0;
+            }
+
             return;
         }
 
