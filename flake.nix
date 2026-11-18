@@ -136,6 +136,7 @@
               -no-reboot \
               -no-shutdown \
               -gdb tcp:127.0.0.1:1234 \
+              -S \
               -serial stdio \
               "$@"
           '';
