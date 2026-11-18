@@ -118,7 +118,7 @@ class Terminal
     volatile std::uint16_t* buffer;
 };
 
-extern "C" void kernel_main()
+extern "C" void kernel_main(std::uint32_t magic, std::uintptr_t multibootInfo)
 {
     Terminal terminal;
 

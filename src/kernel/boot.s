@@ -61,6 +61,9 @@ _start:
     # a register (System V ABI expects this to be clear)
     cld
 
+    movl %eax, %edi
+    movq %rbx, %rsi
+
     call kernel_main
 
     # if kernel_main returns (bad), fall back to hlt loop
